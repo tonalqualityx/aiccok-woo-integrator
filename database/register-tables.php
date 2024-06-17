@@ -5,10 +5,10 @@
  * Please remove it when you no longer need it!
 */
 
-function check_ind_version() {
-    $ind_version = get_option('ind_version');
+function check_wmd_version() {
+    $wmd_version = get_option('wmd_version');
     
-    if (!$ind_version || version_compare($ind_version, '1.0.0', '<')) {
+    if (!$wmd_version || version_compare($wmd_version, '1.0.0', '<')) {
         global $wpdb;
         
         $table_name = $wpdb->prefix . 'sample_table';
@@ -24,8 +24,8 @@ function check_ind_version() {
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);
         
-        update_option('ind_version', '1.0.0');
+        update_option('wmd_version', '1.0.0');
     }
 }
 
-register_activation_hook( INDPL_PLUGIN, 'check_ind_version');
+register_activation_hook( INDPL_PLUGIN, 'check_wmd_version');

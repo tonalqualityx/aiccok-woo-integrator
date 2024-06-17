@@ -1,0 +1,20 @@
+# TODO Setup pipelines on bitbucket
+# 1. Enable pipelines
+# 2. Set the FTP_user and FTP_pass variable
+image: php:8.1
+
+# TODO configure pipeline
+# Change branch name if not production
+# Replace {{ directory }} & {{ SFTP Address }} with appropriate values
+# Run initial pipeline
+# Once pipeline runs successfully, change "init" to "push"
+pipelines:
+  branches:
+    production: # TODO change to branch name if not production
+      - step:
+          name: Deploy to production
+          deployment: production
+          script:
+            - apt-get update
+            - apt-get -qq install git-ftp
+            - git ftp init --user $FTP_user --passwd $FTP_pass --remote-root {{ directory }} {{ SFTP address }} --insecure

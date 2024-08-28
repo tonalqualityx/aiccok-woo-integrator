@@ -1,10 +1,10 @@
 <?php
-/* TODO Change the name & Description
- * Plugin Name: Plugin Template
+/* 
+ * Plugin Name: AICCOK Woo Integrator
  * Plugin URI: https://whoismikedion.com
- * Description: Describe this plugin!
+ * Description: Integrates the existing AICCOK website with WooCommerce & provides shortcodes for membership display
  * Author: Mike Dion
- * Version: 1.0.0
+ * Version: 1.0.2
  * Author URI: https://whoismikedion.com
  * License: GPL2+
  */

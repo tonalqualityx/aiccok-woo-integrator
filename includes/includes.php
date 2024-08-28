@@ -7,14 +7,18 @@ $includes = array(
     "/functions/functions.php",
     "/functions/ajax-functions.php",
 
+    "/includes/enqueues.php",
+    "/includes/user-fields.php",
+
     // Rest API includes
-    "/api/sample-endpoint.php",
+    "/api/test.php",
 
     // Shortcode Includes  
-    "/shortcodes/shortcode-template.php",
+    "/shortcodes/members-list.php",
+    "/shortcodes/listing-management.php",
 
     // Class Includes
-    "/classes/SampleClass.php",
+    // "/classes/SampleClass.php",
 
     // Database Includes
     //  "/database/register-tables.php",

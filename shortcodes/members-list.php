@@ -56,7 +56,7 @@ function members_list_shortcode( $atts ) {
                 <h2><?php echo $display_name; ?></h2>
             <!-- </a> -->
             <p class="bio"><?php echo $user_meta['description'][0]; ?></p>
-            <p><a href="mailto:<?php echo $user->user_email; ?>" ><?php echo $user->user_email; ?></a></p>
+            
             <?php if ( ! empty( $user_data->user_url ) ) { ?>
                 <a href="<?php echo $user_data->user_url; ?>" target="_blank" class="aiccok-button">Visit Website</a>
             <?php } ?>

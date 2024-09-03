@@ -22,6 +22,12 @@ function aiccok_listing_management_shortcode() {
         return $output;
     }
 
+    // Check if the user has an active membership
+    if (!aiccok_has_active_membership($user_id)) {
+        $output = '<p>You need to renew your membership in order to edit your directory listing.</p>';
+        return $output;
+    }
+
     $user_id = get_current_user_id();
     $user_data = get_userdata($user_id);
     $user_meta = get_user_meta($user_id);

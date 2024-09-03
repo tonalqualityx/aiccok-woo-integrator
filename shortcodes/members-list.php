@@ -13,48 +13,25 @@ function members_list_shortcode( $atts ) {
     echo '<div class="aiccok-members-list">';
 
     foreach( $users as $user ){
+        
         $user_meta = get_user_meta( $user->user_id ); 
         $user_data = get_userdata( $user->user_id); 
-
-        // Check if the user has a profile photo by looking in /uploads/aicco-members/user_id/profile_photo.jpg
-        $profile = false;
-        $profile_photo_path = ABSPATH . 'wp-content/uploads/aiccok-members/' . $user->user_id . '/cover_photo.jpg';
-        $profile_photo_path_png = ABSPATH . 'wp-content/uploads/aiccok-members/' . $user->user_id . '/cover_photo.png';
-
-        if ( file_exists( $profile_photo_path ) ) {
-            $profile = '<img src="' . site_url() . '/wp-content/uploads/aiccok-members/' . $user->user_id . '/cover_photo.jpg" alt="' . $user->display_name . ' Profile Photo" />';
-        } elseif ( file_exists( $profile_photo_path_png ) ) {
-            $profile = '<img src="' . site_url() . '/wp-content/uploads/aiccok-members/' . $user->user_id . '/cover_photo.png" alt="' . $user->display_name . ' Profile Photo" />';
-        }
-
-        if( isset( $user_meta['logo'] )) {
-
-            $logo_attachment_id = $user_meta['logo'][0];
-        }
-
-
-        // This is an attachment ID, so we need to get the attachment and we want it in medium size for the front end
-        if ( isset( $logo_attachment_id ) ) {
-            $logo = wp_get_attachment_image_src( $logo_attachment_id, 'medium' );
-        }
+    
+        $profile = aiccok_get_profile( $user_data );
     
 
-        $display_name = '';
+        $display_name = aiccok_get_display_name( $user_meta );
 
 
-        if (isset($user_meta['ai-company'][0]) && !empty($user_meta['ai-company'][0])) {
-            $display_name = $user_meta['ai-company'][0];
-        } else {
-            $display_name = $user_data->first_name . ' ' . $user_data->last_name;
-        }
+        
 
         ?>
 
         <article class="aiccok-member">
-            <!-- <a href="<?php echo get_author_posts_url($user->user_id); ?>" class=""> -->
+            <a href="/membership/member-directory/member?id=<?php echo $user->user_id; ?>" class="">
                 <?php echo $profile ? $profile : '';?>
                 <h2><?php echo $display_name; ?></h2>
-            <!-- </a> -->
+            </a>
             <p class="bio"><?php echo $user_meta['description'][0]; ?></p>
             
             <?php if ( ! empty( $user_data->user_url ) ) { ?>

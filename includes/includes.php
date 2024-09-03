@@ -17,6 +17,7 @@ $includes = array(
     "/shortcodes/members-list.php",
     "/shortcodes/listing-management.php",
     "/shortcodes/renewal.php",
+    "/shortcodes/single-profile.php",
 
     // Class Includes
     // "/classes/SampleClass.php",

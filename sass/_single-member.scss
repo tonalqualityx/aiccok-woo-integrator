@@ -1,0 +1,36 @@
+.single.aiccok-member {
+    max-width: 800px;
+    margin: auto;
+
+    img.cover {
+        display: none;
+    }
+
+    @media screen and (min-width: 768px) {
+        
+        img.cover {
+            display: block;
+        }
+
+        .flex {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 1em;
+
+            img {
+                max-width: 200px;
+                margin-top: -150px;
+                margin-left: 12px;
+            }
+
+
+            h2 {
+                font-size: 2em;
+                margin: 0;
+                font-weight: 800;
+            }
+        }
+    }
+
+}

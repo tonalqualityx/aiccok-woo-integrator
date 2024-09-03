@@ -28,7 +28,12 @@ function aiccok_renewal_shortcode() {
             
             // Output the membership details
             $output = '<h2>Membership: ' . $membership_name . '</h2>';
-            $output .= '<p><strong>Renewal Date:</strong> ' . $renewal_date_formatted . '</p>';
+            // Check if the renewal date is in the past
+            if (strtotime($renewal_date) < time()) {
+                $output .= '<p><strong>Renewal Date:</strong> ' . $renewal_date_formatted . ' (Expired)</p>';
+            } else {
+                $output .= '<p><strong>Renewal Date:</strong> ' . $renewal_date_formatted . '</p>';
+            }
             $output .= '<a href="/membership/" class="aiccok-button">Renew Now</a>';
             
             return $output;

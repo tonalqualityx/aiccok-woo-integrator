@@ -21,7 +21,7 @@ add_action( 'rest_api_init', function () {
 
 function run_the_test() {
 
-    move_um_images();    
+    // move_um_images();    
 
     // transfer_memberships_wc();
 

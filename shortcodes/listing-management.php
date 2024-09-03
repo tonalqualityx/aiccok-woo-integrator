@@ -2,6 +2,26 @@
 
 function aiccok_listing_management_shortcode() {
 
+    if( !is_user_logged_in() ){
+        $output = '<p>You must be <a href="' . wp_login_url() . '">logged in</a> to view this page.</p>';
+        $output .= wp_login_form(array(
+            'redirect' => $_SERVER['REQUEST_URI'],
+            'label_username' => 'Username',
+            'label_password' => 'Password',
+            'label_remember' => 'Remember Me',
+            'label_log_in' => 'Log In',
+            'form_id' => 'login-form-account',
+            'id_username' => 'user-login',
+            'id_password' => 'user-pass',
+            'id_remember' => 'rememberme',
+            'id_submit' => 'wp-submit',
+            'remember' => true,
+            'value_username' => '',
+            'value_remember' => false
+        ));
+        return $output;
+    }
+
     $user_id = get_current_user_id();
     $user_data = get_userdata($user_id);
     $user_meta = get_user_meta($user_id);

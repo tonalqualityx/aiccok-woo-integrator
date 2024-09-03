@@ -200,3 +200,4 @@ function edit_user_profile_shortcode() {
 }
 // Register the member-form shortcode
 add_shortcode('user_profile', 'edit_user_profile_shortcode');
+

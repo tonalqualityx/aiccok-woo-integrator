@@ -74,3 +74,64 @@ function aiccok_get_user_logo( $user_meta ) {
 
     return $logo;
 }
+
+function aiccok_register_custom_user_meta() {
+    register_meta('user', 'ai-chapter', [
+        'type' => 'string',
+        'description' => 'AI Chapter',
+        'single' => true,
+        'show_in_rest' => true,
+    ]);
+}
+add_action('init', 'aiccok_register_custom_user_meta');
+
+function aiccok_display_custom_user_meta( $user ) {
+    $ai_chapter = get_user_meta($user->ID, 'ai-chapter', true);
+
+    $ai_chapter = $ai_chapter ? $ai_chapter : '';
+    echo '<p><label for="ai-chapter">Chapter:</label></p>';
+    echo '<p><select name="ai-chapter" id="ai-chapter">';
+    echo '<option value="OKC" ' . selected( $ai_chapter, 'OKC', false ) . '>OKC</option>';
+    echo '<option value="Southeast" ' . selected( $ai_chapter, 'Southeast', false ) . '>Southeast</option>';
+    echo '<option value="Tulsa" ' . selected( $ai_chapter, 'Tulsa', false ) . '>Tulsa</option>';
+    echo '<option value="Eastern" ' . selected( $ai_chapter, 'Eastern', false ) . '>Eastern</option>';
+    echo '<option value="Southwest" ' . selected( $ai_chapter, 'Southwest', false ) . '>Southwest</option>';
+    echo '<option value="State" ' . selected( $ai_chapter, 'State', false ) . '>State</option>';
+    echo '<option value="North Central" ' . selected( $ai_chapter, 'North Central', false ) . '>North Central</option>';
+    echo '<option value="North East" ' . selected( $ai_chapter, 'North East', false ) . '>North East</option>';
+    echo '</select></p>';
+}
+add_action('show_user_profile', 'aiccok_display_custom_user_meta');
+add_action('edit_user_profile', 'aiccok_display_custom_user_meta');
+
+function aiccok_save_custom_user_meta( $user_id ) {
+    if ( !current_user_can('edit_user', $user_id) ) {
+        return false;
+    }
+
+    if ( isset( $_POST['ai-chapter'] ) ) {
+        update_user_meta( $user_id, 'ai-chapter', $_POST['ai-chapter'] );
+    }
+}
+add_action('personal_options_update', 'aiccok_save_custom_user_meta');
+add_action('edit_user_profile_update', 'aiccok_save_custom_user_meta');
+
+// When a user purchases a product, check for the attribute "Chapter Designation" and update the user meta to match the chapter
+function aiccok_update_user_chapter( $order_id ) {
+
+    $order = wc_get_order( $order_id );
+    $items = $order->get_items();
+
+    foreach ( $items as $item ) {
+        $product_id = $item->get_product_id();
+        $product = wc_get_product( $product_id );
+        $attributes = $product->get_attributes();
+
+        if ( isset( $attributes['chapter-designation'] ) ) {
+            $chapter = $item->get_meta('chapter-designation');
+            $user_id = $order->get_user_id();
+            update_user_meta( $user_id, 'ai-chapter', $chapter );
+        }
+    }
+}
+add_action('woocommerce_thankyou', 'aiccok_update_user_chapter', 10, 1);

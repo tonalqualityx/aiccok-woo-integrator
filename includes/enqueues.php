@@ -10,5 +10,13 @@ function indpl_enqueue(){
        )
     );
     wp_enqueue_script( 'indpl-js' );
+
+    // If the page is /account enqueue the media uploader
+      if( is_page('account') ){
+         wp_enqueue_media();
+
+
+      }
+
   }
   add_action( 'wp_enqueue_scripts', 'indpl_enqueue' );

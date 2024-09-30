@@ -46,15 +46,32 @@ function aiccok_get_display_name( $user_meta) {
 
 function aiccok_get_profile( $user, $type = "cover" ) {
 
-    $profile = false;
-    $profile_photo_path = ABSPATH . 'wp-content/uploads/aiccok-members/' . $user->ID . '/' . $type . '_photo.jpg';
-    $profile_photo_path_png = ABSPATH . 'wp-content/uploads/aiccok-members/' . $user->ID . '/' . $type . '_photo.png';
+    // First check the meta field user_$type_photo
+    $profile = get_user_meta( $user->ID, $type . '_photo_id', true );
 
-    if ( file_exists( $profile_photo_path ) ) {
-        $profile = '<img src="' . site_url() . '/wp-content/uploads/aiccok-members/' . $user->ID . '/' . $type . '_photo.jpg" class="'. $type . '" alt="' . $user->display_name . ' Profile Photo" />';
-    } elseif ( file_exists( $profile_photo_path_png ) ) {
-        $profile = '<img src="' . site_url() . '/wp-content/uploads/aiccok-members/' . $user->ID . '/' . $type . '_photo.png" class="'. $type . '" alt="' . $user->display_name . ' Profile Photo" />';
+    // This will return an attaachment ID, so we need to get the image URL
+    if ( $profile ) {
+
+        $profile = wp_get_attachment_image_src( $profile, 'full' );
+        
+        // Create the img tag
+        $profile = '<img src="' . $profile[0] . '" class="'. $type . '" alt="' . $user->display_name . ' Profile Photo" />';
+
+    } else {
+
+        $profile = false;
+        $profile_photo_path = ABSPATH . 'wp-content/uploads/aiccok-members/' . $user->ID . '/' . $type . '_photo.jpg';
+        $profile_photo_path_png = ABSPATH . 'wp-content/uploads/aiccok-members/' . $user->ID . '/' . $type . '_photo.png';
+
+        if ( file_exists( $profile_photo_path ) ) {
+            $profile = '<img src="' . site_url() . '/wp-content/uploads/aiccok-members/' . $user->ID . '/' . $type . '_photo.jpg" class="'. $type . '" alt="' . $user->display_name . ' Profile Photo" />';
+        } elseif ( file_exists( $profile_photo_path_png ) ) {
+            $profile = '<img src="' . site_url() . '/wp-content/uploads/aiccok-members/' . $user->ID . '/' . $type . '_photo.png" class="'. $type . '" alt="' . $user->display_name . ' Profile Photo" />';
+        }
+
     }
+
+
 
     return $profile;
 }
@@ -135,3 +152,40 @@ function aiccok_update_user_chapter( $order_id ) {
     }
 }
 add_action('woocommerce_thankyou', 'aiccok_update_user_chapter', 10, 1);
+
+// Show the ai-chapter user meta field in the user table
+function aiccok_user_table_head( $columns ) {
+    $columns['ai-chapter'] = 'Chapter';
+    return $columns;
+}
+add_filter('manage_users_columns', 'aiccok_user_table_head');
+
+function aiccok_user_table_content( $value, $column_name, $user_id ) {
+    if ( 'ai-chapter' == $column_name ) {
+        return get_user_meta( $user_id, 'ai-chapter', true );
+    }
+    return $value;
+}
+add_filter('manage_users_custom_column', 'aiccok_user_table_content', 10, 3);
+
+function add_upload_capability_to_roles() {
+
+    // Get all the roles other than "subscriber" and "administrator"
+    $roles = get_editable_roles();
+    $roles = array_keys($roles);
+
+    // Loop through each role and add the capability
+    foreach ($roles as $role_name) {
+        $role = get_role($role_name);
+
+        // If the role is subscriber, skip it
+        if ($role_name == 'subscriber') {
+            continue;
+        }
+        
+        if ($role) {
+            $role->add_cap('upload_files');
+        }
+    }
+}
+add_action('init', 'add_upload_capability_to_roles');

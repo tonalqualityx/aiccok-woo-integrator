@@ -10,7 +10,7 @@ function aiccok_single_profile_shortcode($atts) {
     $user_meta = get_user_meta($user_id);
 
     $display_name = aiccok_get_display_name($user_meta);
-    $profile = aiccok_get_profile($user_data);
+    $cover_photo = aiccok_get_profile($user_data);
     
     $address_1 = !empty($user_meta['billing_address_1'][0]) ? $user_meta['billing_address_1'][0] . "<br>" : '';
     $address_2 = !empty($user_meta['billing_address_2'][0]) ? $user_meta['billing_address_2'][0] . "<br>" : '';
@@ -24,10 +24,10 @@ function aiccok_single_profile_shortcode($atts) {
 
     $logo = aiccok_get_profile($user_data, 'profile');
 
-    ob_start();
-    ?>
+    ob_start(); ?>
+
     <article class="aiccok-member single">
-        <?php echo $profile ? $profile : ''; ?>
+        <?php echo $cover_photo ? $cover_photo : ''; ?>
         <div class="flex">
             <?php if($logo) { ?>
                 <?php echo $logo; ?>
@@ -50,6 +50,11 @@ function aiccok_single_profile_shortcode($atts) {
 
         <?php if (!empty($user_data->user_url)) { ?>
             <a href="<?php echo $user_data->user_url; ?>" target="_blank" class="aiccok-button">Visit Website</a>
+        <?php } ?>
+
+        <?php // If the user is logged in and the user is the same as the profile being viewed, show the edit button
+        if( is_user_logged_in() && get_current_user_id() == $user_id ) { ?>
+            <a href="<?php echo site_url(); ?>/account" class="aiccok-button">Edit Profile</a>
         <?php } ?>
 
     </article>

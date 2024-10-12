@@ -29,8 +29,8 @@ function aiccok_renewal_shortcode() {
             }
             
             // Get the membership renewal date
-            $renewal_date = $membership[0]->get_end_date();
             $renewal_date = '2024-12-31';
+            $renewal_date = $membership[0]->get_end_date();
             
             // Format the renewal date
             $renewal_date_formatted = date('F j, Y', strtotime($renewal_date));

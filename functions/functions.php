@@ -157,6 +157,8 @@ add_action('woocommerce_thankyou', 'aiccok_update_user_chapter', 10, 1);
 // Show the ai-chapter user meta field in the user table
 function aiccok_user_table_head( $columns ) {
     $columns['ai-chapter'] = 'Chapter';
+    $columns['ai-company'] = 'Company Name';
+    $columns['renewal-date'] = 'Renewal Date';
     return $columns;
 }
 add_filter('manage_users_columns', 'aiccok_user_table_head');
@@ -164,6 +166,20 @@ add_filter('manage_users_columns', 'aiccok_user_table_head');
 function aiccok_user_table_content( $value, $column_name, $user_id ) {
     if ( 'ai-chapter' == $column_name ) {
         return get_user_meta( $user_id, 'ai-chapter', true );
+    }
+    if ( 'ai-company' == $column_name ) {
+        return get_user_meta( $user_id, 'ai-company', true );
+    }
+    if( 'renewal-date' == $column_name ) {
+        $renewal_date = wmd_get_renewal_date( $user_id );
+        if( $renewal_date ) {
+            if( $renewal_date == 'Expired' ) {
+                return 'Expired';
+            }
+            return date('F j, Y', strtotime($renewal_date));
+        } else {
+            return '-';
+        }
     }
     return $value;
 }
@@ -190,3 +206,19 @@ function add_upload_capability_to_roles() {
     }
 }
 add_action('init', 'add_upload_capability_to_roles');
+
+function wmd_get_renewal_date( $user_id ) {
+    $memberships = wc_memberships_get_user_memberships( $user_id, ['status' => 'active'] );
+
+    if ( count( $memberships ) > 0 ) {
+        foreach ( $memberships as $membership ) {
+            $expiration_date = $membership->get_end_date();
+            if ( $expiration_date && strtotime( $expiration_date ) < time() ) {
+                return 'Expired';
+            }
+        }
+        return $expiration_date;
+    }
+
+    return false;
+}

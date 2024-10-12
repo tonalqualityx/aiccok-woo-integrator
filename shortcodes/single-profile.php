@@ -30,7 +30,7 @@ function aiccok_single_profile_shortcode($atts) {
         <?php echo $cover_photo ? $cover_photo : ''; ?>
         <div class="flex">
             <?php if($logo) { ?>
-                <?php echo $logo; ?>
+                <?php //echo $logo; ?>
             <?php } ?>
             <h2><?php echo $display_name; ?></h2>
         </div>

@@ -49,6 +49,7 @@ function aiccok_get_profile( $user, $type = "cover" ) {
     // First check the meta field user_$type_photo
     $profile = get_user_meta( $user->ID, $type . '_photo_id', true );
 
+
     // This will return an attaachment ID, so we need to get the image URL
     if ( $profile ) {
 

@@ -32,6 +32,7 @@ function aiccok_listing_management_shortcode() {
     $user_data = get_userdata($user_id);
     $user_meta = get_user_meta($user_id);
 
+
     // Check if the user has a cover photo by looking in /uploads/aicco-members/user_id/cover.jpg
     $saved_cover_photo = aiccok_get_profile($user_data, 'cover');
 
@@ -72,70 +73,86 @@ function aiccok_listing_management_shortcode() {
 
         // Handle profile photo upload
         if (!empty($_FILES['profile_photo']['tmp_name'])) {
+
             $upload_dir = wp_upload_dir();
-            $profile_photo_name = 'profile_photo.jpg';
-            $profile_photo_tmp_name = $_FILES['profile_photo']['tmp_name'];
-            $profile_photo_path = $upload_dir['path'] . '/' . $profile_photo_name;
-            $profile_photo_url = $upload_dir['url'] . '/' . $profile_photo_name;
+            $fileTmpPath = $_FILES['profile_photo']['tmp_name'];
+            $fileName = $_FILES['profile_photo']['name'];
+            $fileSize = $_FILES['profile_photo']['size'];
+            $fileType = $_FILES['profile_photo']['type'];
+            $fileNameCmps = explode(".", $fileName);
+            $fileExtension = strtolower(end($fileNameCmps));
 
-            // Move the uploaded file to the upload directory
-            move_uploaded_file($profile_photo_tmp_name, $profile_photo_path);
+            // Generate a unique file name
+            $newFileName = md5(time() . $fileName) . '.' . $fileExtension;
 
-            // Create the attachment data
-            $attachment = array(
-                'guid'           => $profile_photo_url,
-                'post_mime_type' => 'image/jpeg',
-                'post_title'     => sanitize_file_name($profile_photo_name),
-                'post_content'   => '',
-                'post_status'    => 'inherit'
-            );
+            // Directory in which the uploaded file will be moved
+            $dest_path = $upload_dir['path'] . '/' . $newFileName;
+            $dest_url = $upload_dir['url'] . '/' . $newFileName;
 
-            // Insert the attachment into the media library
-            $attachment_id = wp_insert_attachment($attachment, $profile_photo_path);
+            if (move_uploaded_file($fileTmpPath, $dest_path)) {
+                // Create the attachment data
+                $attachment = array(
+                    'guid'           => $dest_url,
+                    'post_mime_type' => $fileType,
+                    'post_title'     => sanitize_file_name($newFileName),
+                    'post_content'   => '',
+                    'post_status'    => 'inherit'
+                );
 
-            // Generate the attachment metadata
-            $attachment_data = wp_generate_attachment_metadata($attachment_id, $profile_photo_path);
+                // Insert the attachment into the media library
+                $attachment_id = wp_insert_attachment($attachment, $dest_path);
 
-            // Update the attachment metadata
-            wp_update_attachment_metadata($attachment_id, $attachment_data);
+                // Generate the attachment metadata
+                $attachment_data = wp_generate_attachment_metadata($attachment_id, $dest_path);
 
-            // Save the attachment id to profile_photo_id for this user
-            update_user_meta($user_id, 'profile_photo_id', $attachment_id);
+                // Update the attachment metadata
+                wp_update_attachment_metadata($attachment_id, $attachment_data);
+
+                // Save the attachment ID to user meta
+                update_user_meta(get_current_user_id(), 'profile_photo_id', $attachment_id);
+            }
         }
 
 
         // Handle profile photo upload
         if (!empty($_FILES['cover_photo']['tmp_name'])) {
             $upload_dir = wp_upload_dir();
-            $cover_photo_name = 'cover_photo.jpg';
-            $cover_photo_tmp_name = $_FILES['cover_photo']['tmp_name'];
-            $cover_photo_path = $upload_dir['path'] . '/' . $cover_photo_name;
-            $cover_photo_url = $upload_dir['url'] . '/' . $cover_photo_name;
+            $fileTmpPath = $_FILES['cover_photo']['tmp_name'];
+            $fileName = $_FILES['cover_photo']['name'];
+            $fileSize = $_FILES['cover_photo']['size'];
+            $fileType = $_FILES['cover_photo']['type'];
+            $fileNameCmps = explode(".", $fileName);
+            $fileExtension = strtolower(end($fileNameCmps));
 
-            // Move the uploaded file to the upload directory
-            move_uploaded_file($cover_photo_tmp_name, $cover_photo_path);
+            // Generate a unique file name
+            $newFileName = md5(time() . $fileName) . '.' . $fileExtension;
 
-            // Create the attachment data
-            $attachment = array(
-                'guid'           => $cover_photo_url,
-                'post_mime_type' => 'image/jpeg',
-                'post_title'     => sanitize_file_name($cover_photo_name),
-                'post_content'   => '',
-                'post_status'    => 'inherit'
-            );
+            // Directory in which the uploaded file will be moved
+            $dest_path = $upload_dir['path'] . '/' . $newFileName;
+            $dest_url = $upload_dir['url'] . '/' . $newFileName;
 
-            // Insert the attachment into the media library
-            $attachment_id = wp_insert_attachment($attachment, $cover_photo_path);
+            if (move_uploaded_file($fileTmpPath, $dest_path)) {
+                // Create the attachment data
+                $attachment = array(
+                    'guid'           => $dest_url,
+                    'post_mime_type' => $fileType,
+                    'post_title'     => sanitize_file_name($newFileName),
+                    'post_content'   => '',
+                    'post_status'    => 'inherit'
+                );
 
+                // Insert the attachment into the media library
+                $attachment_id = wp_insert_attachment($attachment, $dest_path);
 
-            // Generate the attachment metadata
-            $attachment_data = wp_generate_attachment_metadata($attachment_id, $cover_photo_path);
+                // Generate the attachment metadata
+                $attachment_data = wp_generate_attachment_metadata($attachment_id, $dest_path);
 
-            // Update the attachment metadata
-            wp_update_attachment_metadata($attachment_id, $attachment_data);
+                // Update the attachment metadata
+                wp_update_attachment_metadata($attachment_id, $attachment_data);
 
-            // Save the attachment id to cover_photo_id for this user
-            update_user_meta($user_id, 'cover_photo_id', $attachment_id);
+                // Save the attachment ID to user meta
+                update_user_meta(get_current_user_id(), 'cover_photo_id', $attachment_id);
+            }
         }
 
         // Redirect to the same page to prevent form resubmission
@@ -152,6 +169,7 @@ function aiccok_listing_management_shortcode() {
     $phone_number = isset($user_meta['billing_phone'][0]) ? $user_meta['billing_phone'][0] : '';
 
     $description = isset($user_meta['description'][0]) ? $user_meta['description'][0] : '';
+
     $cover_photo = wp_upload_dir()['baseurl'] . '/aicco-members/' . $user_id . '/cover_photo.jpg';
     $profile_photo = wp_upload_dir()['baseurl'] . '/aicco-members/' . $user_id . '/profile_photo.jpg';
 
@@ -163,7 +181,9 @@ function aiccok_listing_management_shortcode() {
     $output .= '<h2>Directory Listing</h2>';
     $output .= '<form method="post" action="" enctype="multipart/form-data">';
     $output .= '<label for="display_name"><span>Display Name:</span> <input type="text" name="display_name" value="' . $user_data->display_name . '"></label><br>';
+
     $company = isset($user_meta['ai-company'][0]) ? $user_meta['ai-company'][0] : '';
+    
     $output .= '<label for="company"><span>Company/Organization:</span> <input type="text" name="company" value="' . $company . '"></label><br>';
     $output .= '<label for="description"><span>Description:</span> <textarea name="description">' . $description . '</textarea></label><br>';
     $output .= '<label for="email"><span>Email:</span> <input type="email" name="email" value="' . $email . '"></label><br>';
@@ -176,18 +196,18 @@ function aiccok_listing_management_shortcode() {
     $output .= '<label for="country"><span>Country:</span> <input type="text" name="country" value="' . $country . '"></label><br>';
     
     // Check if profile photo exists and display it
-    if ($profile_photo) {
-        $output .= '<p>Profile Photo:</p>';
-        $output .= '<img src="' . $profile_photo . '" alt="Profile Photo">';
-    }
+    // if ($profile_photo) {
+    //     $output .= '<p>Profile Photo:</p>';
+    //     $output .= '<img src="' . $profile_photo . '" alt="Profile Photo">';
+    // }
     // Add JavaScript to handle the media library
     ob_start();
     ?>
-    <label for="profile_photo"><span>Current Profile Photo:</span>
+    <!-- <label for="profile_photo"><span>Current Profile Photo:</span>
         <?php echo wp_get_attachment_image(get_user_meta($user_id, 'profile_photo_id', true), 'thumbnail'); ?>
         <br>
         <input type="file" name="profile_photo" class="upload-profile-photo" value="Upload Profile Photo" accept=".jpg, .jpeg, .png">
-    </label><br>
+    </label><br> -->
 
     <?php
 

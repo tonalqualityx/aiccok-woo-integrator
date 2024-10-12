@@ -17,11 +17,20 @@ function aiccok_renewal_shortcode() {
         
         // Check if the user has an active membership
         if ($membership) {
+
+            $membership_name = "Unknown Membership - Please contact support";
+
             // Get the membership name
-            $membership_name = $membership[0]->get_plan()->get_name();
+            foreach( $membership as $m ){
+                // Check if the membership has a plan
+                if( $m->get_plan() ){
+                    $membership_name = $m->get_plan()->get_name();
+                }
+            }
             
             // Get the membership renewal date
             $renewal_date = $membership[0]->get_end_date();
+            $renewal_date = '2024-12-31';
             
             // Format the renewal date
             $renewal_date_formatted = date('F j, Y', strtotime($renewal_date));

@@ -20,3 +20,16 @@ function indpl_enqueue(){
 
   }
   add_action( 'wp_enqueue_scripts', 'indpl_enqueue' );
+
+// Enqueue admin.js for the admin page
+function indpl_admin_enqueue(){
+   wp_enqueue_script( 'indpl-admin-js', INDPL_ROOT_URL . 'js/admin.min.js', array( 'jquery' ), INDPL_VERSION );
+   wp_localize_script( 'indpl-admin-js', 'indpl_ajax',
+         array(
+         'ajaxurl' => admin_url( 'admin-ajax.php' ),
+         'nonce' => wp_create_nonce( 'INDPL_nonce', 'security' ),
+         )
+   );
+}
+
+add_action( 'admin_enqueue_scripts', 'indpl_admin_enqueue' );

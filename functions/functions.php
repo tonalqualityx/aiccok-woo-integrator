@@ -222,3 +222,93 @@ function wmd_get_renewal_date( $user_id ) {
 
     return false;
 }
+
+function wmd_get_all_members() {
+    // Initialize the members array
+    $members = [];
+
+    // Get all users
+    $users = get_users();
+
+    // Loop through each member and get their user meta
+    foreach( $users as $user ) {
+        $additional_voting = null;
+
+        // Check to see if the user has an active membership to the additional voting membership
+        $additional_voting = wc_memberships_get_user_memberships( $user->ID, ['status' => 'active', 'plan' => 'additional-voting'] );
+
+        $user_meta = get_user_meta( $user->ID );
+
+        // Get the user's membership
+        $membership = wc_memberships_get_user_memberships( $user->ID, ['status' => 'active'] );
+
+        // Get the membership plan
+        $membership_plan = '';
+        if( is_array($membership) && count($membership) > 0 ) {
+            foreach( $membership as $m ) {
+                if( $m->get_plan() ) {
+                    $membership_plan = $m->get_plan()->get_name();
+                }
+            }
+        }
+
+        // Get the membership expiration date
+        $expiration_date = '';
+        if( is_array($membership) && count($membership) > 0 ) {
+            $expiration_date = $membership[0]->get_end_date();
+        }
+
+        // Get the chapter designation
+        $chapter_designation = '';
+        if( isset( $user_meta['ai-chapter'] ) && isset($user_meta['ai-chapter'][0]) ) {
+            $chapter_designation = $user_meta['ai-chapter'][0];
+        }
+
+        // Add the user meta to the array
+        $members[] = [
+            'First Name' => $user->first_name,
+            'Last Name' => $user->last_name,
+            'Company Name' => isset($user_meta['ai-company'][0]) ? $user_meta['ai-company'][0] : '',
+            'Membership Type' => $membership_plan,
+            'Membership Status' => 'Active',
+            'Membership Expiration Date' => $expiration_date ? date('m/d/Y', strtotime($expiration_date)) : '',
+            'Chapter Designation' => $chapter_designation,
+            'Additional Voting Membership' => $additional_voting ? 'Yes' : 'No',
+        ];
+    }
+
+    return $members;
+}
+
+// Add wmd_get_all_members to be azvailable to ajax
+add_action('wp_ajax_wmd_get_all_members', 'wmd_get_all_members');
+
+function wmd_export_members() {
+    // Check if the export button was clicked
+    if( isset( $_POST['export'] ) ){
+        
+        $members = wmd_get_all_members();
+
+        $filename = 'members-for-voting.csv';
+        header('Content-type: application/csv');
+        header('Content-Disposition: attachment; filename='.$filename);
+        header('Pragma: no-cache');
+        header('Expires: 0');
+
+        $fp = fopen('php://output', 'w');
+
+        // Use First Name, Last Name, Company Name, Membership Type, Membership Status, Membership Expiration Date, Chapter Designation, and Additional Voting Membership as keys and headers
+        $membership_header = array('First Name', 'Last Name', 'Company Name', 'Membership Type', 'Membership Status', 'Membership Expiration Date', 'Chapter Designation', 'Additional Voting Membership');
+        fputcsv($fp, $membership_header);
+
+        foreach ($members as $member) {
+            fputcsv($fp, $member);
+        }
+
+        fclose($fp);
+        exit;
+    }
+}
+
+// Make accessible via ajax
+add_action('wp_ajax_wmd_export_members', 'wmd_export_members');

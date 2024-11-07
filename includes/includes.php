@@ -4,20 +4,24 @@
 
 
 $includes = array(
-    "/functions/functions.php",
-    "/functions/ajax-functions.php",
+    "functions/functions.php",
+    "functions/ajax-functions.php",
 
-    "/includes/enqueues.php",
-    "/includes/user-fields.php",
+    "includes/enqueues.php",
+    "includes/user-fields.php",
 
     // Rest API includes
-    "/api/test.php",
+    "api/test.php",
+    "api/export-members.php",
 
     // Shortcode Includes  
-    "/shortcodes/members-list.php",
-    "/shortcodes/listing-management.php",
-    "/shortcodes/renewal.php",
-    "/shortcodes/single-profile.php",
+    "shortcodes/members-list.php",
+    "shortcodes/listing-management.php",
+    "shortcodes/renewal.php",
+    "shortcodes/single-profile.php",
+
+    // Admin Pages
+    "admin/exports.php",
 
     // Class Includes
     // "/classes/SampleClass.php",

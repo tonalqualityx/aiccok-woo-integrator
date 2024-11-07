@@ -258,10 +258,20 @@ function wmd_get_all_members() {
             $expiration_date = $membership[0]->get_end_date();
         }
 
+        // If the expiration date is in the past skip this user
+        if( $expiration_date && strtotime($expiration_date) < time() || $expiration_date == '' ) {
+            continue;
+        }
+
         // Get the chapter designation
         $chapter_designation = '';
         if( isset( $user_meta['ai-chapter'] ) && isset($user_meta['ai-chapter'][0]) ) {
             $chapter_designation = $user_meta['ai-chapter'][0];
+        }
+
+        // Remove commas from the company name
+        if( isset( $user_meta['ai-company'] ) && isset($user_meta['ai-company'][0]) ) {
+            $user_meta['ai-company'][0] = str_replace(',', '', $user_meta['ai-company'][0]);
         }
 
         // Add the user meta to the array

@@ -4,7 +4,7 @@
  * Plugin URI: https://whoismikedion.com
  * Description: Integrates the existing AICCOK website with WooCommerce & provides shortcodes for membership display
  * Author: Mike Dion
- * Version: 1.0.10
+ * Version: 1.0.11
  * Author URI: https://whoismikedion.com
  * License: GPL2+
  */

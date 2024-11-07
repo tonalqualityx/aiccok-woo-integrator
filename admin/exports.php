@@ -12,6 +12,9 @@ function indpl_exports_page(){
         </form>
 
         <?php 
+
+        var_dump( wmd_get_all_active_memberships() );
+
         $memberships = wmd_get_all_members(); 
        
         // Format and print the membership array as csv data in a string

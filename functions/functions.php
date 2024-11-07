@@ -232,6 +232,7 @@ function wmd_get_all_members() {
 
     // Loop through each member and get their user meta
     foreach( $users as $user ) {
+
         $additional_voting = null;
 
         // Check to see if the user has an active membership to the additional voting membership
@@ -322,3 +323,47 @@ function wmd_export_members() {
 
 // Make accessible via ajax
 add_action('wp_ajax_wmd_export_members', 'wmd_export_members');
+
+function wmd_get_all_active_memberships() {
+
+    $memberships = array();
+
+    // $memberships = wc_memberships_get_memberships([
+    //     'status' => 'active',
+    // ]);
+
+    $active_memberships = [];
+
+    foreach( $memberships as $membership ) {
+        $active_memberships[] = [
+            'ID' => $membership->get_id(),
+            'Name' => $membership->get_name(),
+            'Plan' => $membership->get_plan()->get_name(),
+            'Expiration Date' => $membership->get_end_date(),
+        ];
+    }
+
+    return $active_memberships;
+}
+
+// On the wc_user_membership page add a column for the users chapter
+function wmd_add_user_membership_column( $columns ) {
+    $columns['ai-chapter'] = 'Chapter';
+    return $columns;
+}
+
+function wmd_user_membership_column_content( $column, $post_id ) {
+    if ( 'ai-chapter' === $column ) {
+        // Get the order_id from the post meta
+        $order = get_post_meta( $post_id, '_order_id', true );
+
+        // Get the user_id from the order
+        $user_id = get_post_meta( $order, '_customer_user', true );
+        
+        $ai_chapter = get_user_meta( $user_id, 'ai-chapter', true );
+        echo $ai_chapter ? $ai_chapter : $post_id;
+    }
+}
+add_action( 'manage_wc_user_membership_posts_custom_column', 'wmd_user_membership_column_content', 10, 2 );
+
+add_filter('manage_wc_user_membership_posts_columns', 'wmd_add_user_membership_column');

@@ -20,10 +20,76 @@ add_action( 'rest_api_init', function () {
 } );
 
 function run_the_test() {
+    $members = wmd_get_all_members();
+    // wmd_export_members();   
+
+    // Get all posts of the tyoe wc_user_membership
+    // $memberships = get_posts(array(
+    //     'post_type' => 'wc_user_membership',
+    //     'posts_per_page' => -1,
+    //     'post_status' => 'wcm-active',
+    // ));
+
+    return $members;
 
     // move_um_images();    
 
     // transfer_memberships_wc();
+
+    // $membership = wc_memberships_get_user_active_memberships( 897 );
+
+
+    // $membership_plan = array();
+    // if( is_array($membership) && count($membership) > 0 ) {
+    //     foreach( $membership as $m ) {
+    //         if( $m->get_plan() ) {
+    //             $membership_plan[] = $m->get_plan()->get_name();
+    //         }
+    //     }
+    // }
+
+    // $user_meta = get_user_meta( 897 );
+
+    // $user = get_user_by('id', 897);
+
+    // // Get the membership expiration date
+    // $expiration_date = '';
+    // if( is_array($membership) && count($membership) > 0 ) {
+    //     $expiration_date = $membership[0]->get_end_date();
+    //     var_dump($expiration_date);
+    // }
+
+    // // If the expiration date is in the past skip this user
+    // if( $expiration_date && strtotime($expiration_date) < time() || $expiration_date == '' ) {
+    //     var_dump('skipping');
+    //     // continue;
+    // }
+
+    // // Get the chapter designation
+    // $chapter_designation = '';
+    // if( isset( $user_meta['ai-chapter'] ) && isset($user_meta['ai-chapter'][0]) ) {
+    //     $chapter_designation = $user_meta['ai-chapter'][0];
+    // }
+
+    // // Remove commas from the company name
+    // if( isset( $user_meta['ai-company'] ) && isset($user_meta['ai-company'][0]) ) {
+    //     $user_meta['ai-company'][0] = str_replace(',', '', $user_meta['ai-company'][0]);
+    // }
+
+    // $members = array();
+    // // Add the user meta to the array
+    // $members[] = [
+    //     'First Name' => $user->first_name,
+    //     'Last Name' => $user->last_name,
+    //     'Company Name' => isset($user_meta['ai-company'][0]) ? $user_meta['ai-company'][0] : '',
+    //     'Membership Type' => implode(" | ", $membership_plan),
+    //     'Membership Status' => 'Active',
+    //     'Membership Expiration Date' => $expiration_date ? date('m/d/Y', strtotime($expiration_date)) : '',
+    //     'Chapter Designation' => $chapter_designation,
+    //     // 'Additional Voting Membership' => $additional_voting ? 'Yes' : 'No',
+    // ];
+
+    // var_dump($members);
 
 }
 

@@ -227,42 +227,55 @@ function wmd_get_all_members() {
     // Initialize the members array
     $members = [];
 
-    // Get all users
-    $users = get_users();
+    $memberships = get_posts(array(
+        'post_type' => 'wc_user_membership',
+        'posts_per_page' => -1,
+        'post_status' => 'wcm-active',
+    ));
 
     // Loop through each member and get their user meta
-    foreach( $users as $user ) {
+    foreach( $memberships as $membership ) {
 
-        $additional_voting = null;
-
-        // Check to see if the user has an active membership to the additional voting membership
-        $additional_voting = wc_memberships_get_user_memberships( $user->ID, ['status' => 'active', 'plan' => 'additional-voting'] );
+        $user = get_user_by('id', $membership->post_author);
 
         $user_meta = get_user_meta( $user->ID );
 
         // Get the user's membership
-        $membership = wc_memberships_get_user_memberships( $user->ID, ['status' => 'active'] );
+        // $membership = wc_memberships_get_user_active_memberships( $user->ID );
 
         // Get the membership plan
-        $membership_plan = '';
-        if( is_array($membership) && count($membership) > 0 ) {
-            foreach( $membership as $m ) {
-                if( $m->get_plan() ) {
-                    $membership_plan = $m->get_plan()->get_name();
-                }
-            }
+        // $membership_plan = array();
+        // if( is_array($membership) && count($membership) > 0 ) {
+        //     foreach( $membership as $m ) {
+        //         if( $m->get_plan() ) {
+        //             $membership_plan[] = $m->get_plan()->get_name();
+        //         }
+        //     }
+        // }
+
+        $membership_plan_id = get_post_meta( $membership->ID, '_product_id', true );
+
+        $membership_plan = get_the_title( $membership_plan_id );
+        // var_dump( $membership_plan );
+
+        if( empty($membership_plan) ) {
+            // continue;
         }
 
         // Get the membership expiration date
         $expiration_date = '';
-        if( is_array($membership) && count($membership) > 0 ) {
-            $expiration_date = $membership[0]->get_end_date();
-        }
+        // if( is_array($membership) && count($membership) > 0 ) {
+        //     $expiration_date = $membership[0]->get_end_date();
+        // }
+
+        // Get membership postmeta _start_date and calculate 1 year from that date
+        $start_date = get_post_meta( $membership->ID, '_start_date', true );
+        $expiration_date = date('Y-m-d', strtotime('+1 year', strtotime($start_date)));
 
         // If the expiration date is in the past skip this user
-        if( $expiration_date && strtotime($expiration_date) < time() || $expiration_date == '' ) {
-            continue;
-        }
+        // if( $expiration_date && strtotime($expiration_date) < time() || $expiration_date == '' ) {
+        //     continue;
+        // }
 
         // Get the chapter designation
         $chapter_designation = '';
@@ -284,8 +297,18 @@ function wmd_get_all_members() {
             'Membership Status' => 'Active',
             'Membership Expiration Date' => $expiration_date ? date('m/d/Y', strtotime($expiration_date)) : '',
             'Chapter Designation' => $chapter_designation,
-            'Additional Voting Membership' => $additional_voting ? 'Yes' : 'No',
+            // 'Additional Voting Membership' => $additional_voting ? 'Yes' : 'No',
         ];
+
+        if( $user->ID == 897 ) {
+            // var_dump('BETSY!');
+            // var_dump($members);
+        }
+
+        // Order the $members by last name descending
+        usort($members, function($a, $b) {
+            return $a['Last Name'] <=> $b['Last Name'];
+        });
     }
 
     return $members;
@@ -312,11 +335,15 @@ function wmd_export_members() {
         $membership_header = array('First Name', 'Last Name', 'Company Name', 'Membership Type', 'Membership Status', 'Membership Expiration Date', 'Chapter Designation', 'Additional Voting Membership');
         fputcsv($fp, $membership_header);
 
+        $stored = [];
         foreach ($members as $member) {
+            $stored[] = $member;
             fputcsv($fp, $member);
         }
 
         fclose($fp);
+
+        // var_dump( $stored );
         exit;
     }
 }

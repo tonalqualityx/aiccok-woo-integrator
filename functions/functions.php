@@ -256,11 +256,25 @@ function wmd_get_all_members() {
         $membership_plan_id = get_post_meta( $membership->ID, '_product_id', true );
 
         $membership_plan = get_the_title( $membership_plan_id );
-        // var_dump( $membership_plan );
 
         if( empty($membership_plan) ) {
-            // continue;
+            
+            // Get the user's active subscriptions
+            $subscriptions = wc_memberships_get_user_active_memberships( $user->ID, ['status' => 'active'] );
+
+            $plans = [];
+            // // Loop through each subscription and get the product name
+            foreach( $subscriptions as $subscription ) {
+                $plans[] = $subscription->plan->name;
+            }
+
+            $membership_plan = implode(', ', $plans);
+
+            // var_dump( $membership_plan );
+
+
         }
+
 
         // Get the membership expiration date
         $expiration_date = '';

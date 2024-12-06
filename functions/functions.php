@@ -207,14 +207,15 @@ function add_upload_capability_to_roles() {
 }
 add_action('init', 'add_upload_capability_to_roles');
 
-function wmd_get_renewal_date( $user_id ) {
+function wmd_get_renewal_date( $user_id, $return_date = false ) {
     $memberships = wc_memberships_get_user_memberships( $user_id, ['status' => 'active'] );
 
     if ( count( $memberships ) > 0 ) {
         foreach ( $memberships as $membership ) {
             $expiration_date = $membership->get_end_date();
             if ( $expiration_date && strtotime( $expiration_date ) < time() ) {
-                return 'Expired';
+                
+                return $return_date ? $expiration_date : 'Expired';
             }
         }
         return $expiration_date;
@@ -233,10 +234,14 @@ function wmd_get_all_members() {
         'post_status' => 'wcm-active',
     ));
 
+    $active_members = [];
+
     // Loop through each member and get their user meta
     foreach( $memberships as $membership ) {
 
         $user = get_user_by('id', $membership->post_author);
+
+        $active_members[] = $user->ID;
 
         $user_meta = get_user_meta( $user->ID );
 
@@ -323,6 +328,33 @@ function wmd_get_all_members() {
         usort($members, function($a, $b) {
             return $a['Last Name'] <=> $b['Last Name'];
         });
+    }
+
+    // Get users who are not part of the active members array
+    $users = get_users([
+        'exclude' => $active_members,
+    ]);
+
+    foreach( $users as $user ) {
+
+        $user_meta = get_user_meta( $user->ID );
+
+        // Check if the user has an expired membership
+        $expired = wmd_get_renewal_date( $user->ID, true );
+
+        
+
+        $members[] = [
+            'First Name' => $user->first_name,
+            'Last Name' => $user->last_name,
+            'Company Name' => isset($user_meta['ai-company'][0]) ? $user_meta['ai-company'][0] : '',
+            'Membership Type' => 'None',
+            'Membership Status' => 'Inactive',
+            'Membership Expiration Date' => $expired ? date('m/d/Y', strtotime($expired)) : '',
+            'Chapter Designation' => isset($user_meta['ai-chapter'][0]) ? $user_meta['ai-chapter'][0] : '',
+            // 'Additional Voting Membership' => $additional_voting ? 'Yes' : 'No',
+        ];
+
     }
 
     return $members;

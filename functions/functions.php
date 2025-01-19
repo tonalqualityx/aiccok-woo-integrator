@@ -321,10 +321,10 @@ function wmd_get_all_members() {
             // 'Additional Voting Membership' => $additional_voting ? 'Yes' : 'No',
         ];
 
-        if( $user->ID == 897 ) {
-            // var_dump('BETSY!');
-            // var_dump($members);
-        }
+        // if( $user->ID == 897 ) {
+        //     // var_dump('BETSY!');
+        //     // var_dump($members);
+        // }
 
         // Order the $members by last name descending
         usort($members, function($a, $b) {
@@ -354,6 +354,8 @@ function wmd_get_all_members() {
             'Membership Status' => 'Inactive',
             'Membership Expiration Date' => $expired ? date('m/d/Y', strtotime($expired)) : '',
             'Chapter Designation' => isset($user_meta['ai-chapter'][0]) ? $user_meta['ai-chapter'][0] : '',
+            'Email' => $user->user_email,
+            'Created' => date('m/d/Y', strtotime($user->user_registered)),
             // 'Additional Voting Membership' => $additional_voting ? 'Yes' : 'No',
         ];
 

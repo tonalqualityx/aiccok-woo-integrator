@@ -16,7 +16,7 @@ function indpl_exports_page(){
 
         <?php 
 
-        var_dump( wmd_get_all_active_memberships() );        
+        // var_dump( wmd_get_all_active_memberships() );        
         
         ?>
     </div>
@@ -41,31 +41,33 @@ function export_members_csv() {
 
     $memberships = wmd_get_all_members(); 
        
-        // Format and print the membership array as csv data in a string
-        $csv = '';
+    // Format and print the membership array as csv data in a string
+    $csv = '';
 
-        // Add headers to the CSV
-        $csv .= 'First Name,Last Name,Company Name,Membership Type,Membership Status,Membership Expiration Date,Chapter Designation,Additional Voting Membership' . "\n";
+    // Add headers to the CSV
+    $csv .= 'First Name,Last Name,Company Name,Membership Type,Membership Status,Membership Expiration Date,Chapter Designation,Email,User Created' . "\n";
 
-        foreach( $memberships as $membership ){
-            $csv .= '"' . $membership['First Name'] . '",';
-            $csv .= '"' . $membership['Last Name'] . '",';
-            $csv .= '"' . $membership['Company Name'] . '",';
-            $csv .= '"' . $membership['Membership Type'] . '",';
-            $csv .= '"' . $membership['Membership Status'] . '",';
-            $csv .= '"' . $membership['Membership Expiration Date'] . '",';
-            $csv .= '"' . $membership['Chapter Designation'] . '",';
-            // $csv .= '"' . $membership['Additional Voting Membership'] . '",';
-            $csv .= "\n";
-        }
+    foreach( $memberships as $membership ){
+        $csv .= '"' . $membership['First Name'] . '",';
+        $csv .= '"' . $membership['Last Name'] . '",';
+        $csv .= '"' . $membership['Company Name'] . '",';
+        $csv .= '"' . $membership['Membership Type'] . '",';
+        $csv .= '"' . $membership['Membership Status'] . '",';
+        $csv .= '"' . $membership['Membership Expiration Date'] . '",';
+        $csv .= '"' . $membership['Chapter Designation'] . '",';
+        $csv .= '"' . $membership['Email'] . '",';
+        $csv .= '"' . $membership['Created'] . '",';
+        // $csv .= '"' . $membership['Additional Voting Membership'] . '",';
+        $csv .= "\n";
+    }
 
-        // echo $csv;
+    // echo $csv;
 
-        //download the CSV file
-        if( isset($_POST['export']) ){
-            header('Content-Type: text/csv');
-            header('Content-Disposition: attachment; filename="voting-members.csv"');
-            echo $csv;
-            exit();
-        }
+    //download the CSV file
+    if( isset($_POST['export']) ){
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment; filename="voting-members.csv"');
+        echo $csv;
+        exit();
+    }
 }

@@ -316,6 +316,8 @@ function wmd_get_all_members() {
             'Membership Status' => 'Active',
             'Membership Expiration Date' => $expiration_date ? date('m/d/Y', strtotime($expiration_date)) : '',
             'Chapter Designation' => $chapter_designation,
+            'Email' => $user->user_email,
+            'Created' => date('m/d/Y', strtotime($user->user_registered)),
             // 'Additional Voting Membership' => $additional_voting ? 'Yes' : 'No',
         ];
 
